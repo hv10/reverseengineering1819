@@ -62,7 +62,7 @@ class Typeguesser():
         if kind is None:
             print("Filetype doesn't know what this is.")
             # do smth useful here like OUR guessing
-            print(self.is_in_ascii_range(blob))
+            # print(self.is_in_ascii_range(blob))
         else:
             return kind
 
