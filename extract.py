@@ -1,6 +1,6 @@
 from pathlib import Path
 import sys
-
+import filetype
 from PIL import Image 
 
 class WarExtractor():
@@ -47,12 +47,41 @@ class WarExtractor():
         img = Image.frombytes("P",size,data[boundary[0]:boundary[1]])
         img.show()
 
+    def get_blob(self, index):
+        entry = self.file_entries[str(index)]
+        blob = self.data[entry["offset"]:entry["offset"]+entry["blobsize"]]
+        return blob
+
+class Typeguesser():
+    def __init__(self, blob=None):
+        if blob is not None:
+            self.guess(blob)
+
+    def guess(self, blob):
+        kind = filetype.guess(blob)
+        if kind is None:
+            print("Filetype doesn't know what this is.")
+            # do smth useful here like OUR guessing
+            print(self.is_in_ascii_range(blob))
+        else:
+            return kind
+
+    def is_in_ascii_range(self,blob):
+        return all(c < 128 for c in blob)
 
 if __name__=="__main__":
     file_oi = Path("./War Data")
     w = WarExtractor(file_oi)
+    t = Typeguesser()
     print(w.get_version())
     w.build_filetable()
     print(w.file_entries)
+    while True:
+        index = int(input("index>"))
+        blob = w.get_blob(index)
+        print(blob)
+        open("blob.mid","wb+").write(blob)
+        print(t.guess(blob))
+    
     for key, val in w.file_entries.items():
         if (w.file_entries[key]["compressed"]):print(val)
