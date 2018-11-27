@@ -16,8 +16,12 @@ class Prover():
     """
     Inherit from me to score a testing scenario.
 
-    decorate a test_case with "@score_with(amount)" to track the points generated!
-    all functions with "test" in the beginning of the signature will be evaluated
+    Decorate a test_case with "@score_with(amount)" to track
+    the points generated!
+    All functions with "test" in the beginning of the signature 
+    will be evaluated on initialisation of the class.
+
+    A child-class should only track points for a _single_ scenario!
     """
     def __init__(self,*args,**kwargs):
         self.__class__.score = 0
