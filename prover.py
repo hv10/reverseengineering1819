@@ -1,0 +1,44 @@
+import unittest
+from functools import wraps
+
+
+def score_with(score):
+    def decorator(fn):
+        def decorated(*args,**kwargs):
+            ret = fn(*args,**kwargs) 
+            if ret:
+                args[0].__class__._increase_score(score)
+            return ret
+        return decorated
+    return decorator
+
+class Prover():
+    """
+    Inherit from me to score a testing scenario.
+
+    decorate a test_case with "@score_with(amount)" to track the points generated!
+    all functions with "test" in the beginning of the signature will be evaluated
+    """
+    def __init__(self,*args,**kwargs):
+        self.__class__.score = 0
+        self.run()
+    
+    @classmethod
+    def _increase_score(cls,scr):
+        cls.score += scr
+    
+    def run(self, *args,**kwargs):
+        public_method_names = [
+            method for method in dir(self) 
+            if callable(getattr(self, method)) 
+            if method.startswith('test')
+        ]  # 'private' methods start from _
+        for method in public_method_names:
+            print(method)
+            getattr(self, method)()
+        print("Points reached: ",self.__class__.score)
+        return self.score
+
+
+if __name__=="__main__":
+    Prover()
