@@ -19,13 +19,12 @@ class Prover():
     Decorate a test_case with "@score_with(amount)" to track
     the points generated!
     All functions with "test" in the beginning of the signature 
-    will be evaluated on initialisation of the class.
+    will be evaluated upon calling .run() of the instance.
 
     A child-class should only track points for a _single_ scenario!
     """
     def __init__(self,*args,**kwargs):
         self.__class__.score = 0
-        self.run()
     
     @classmethod
     def _increase_score(cls,scr):
