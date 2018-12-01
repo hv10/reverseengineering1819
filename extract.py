@@ -1,9 +1,11 @@
 from pathlib import Path
+from PIL import Image
+import os
 import sys
 import filetype
 import math
 import struct
-from PIL import Image
+import simpleaudio as sa
 
 
 class WarExtractor():
@@ -89,12 +91,14 @@ class Typeguesser():
     def is_in_ascii_range(self, blob):
         return all(c < 128 for c in blob)
 
+# http://soundfile.sapp.org/doc/WaveFormat/
+
 
 def add_wave_header(blob):
     format_length = 16
     wav_fmt = 1
     channels = 1
-    sample_rate = 11000
+    sample_rate = 11025
     bits_per_sample = 8
     blog_align = channels * ((bits_per_sample + 7) // 8)
     bytes_per_second = sample_rate * blog_align
@@ -110,7 +114,14 @@ def add_wave_header(blob):
     return struct.pack("12s24s" + str(len(data)) + "s", header, fmt, data)
 
 
+def setup():
+    if not os.path.exists("audio/"):
+        os.mkdir("audio/")
+
+
 if __name__ == "__main__":
+    setup()
+
     file_oi = Path("./War Data")
     w = WarExtractor(file_oi)
     t = Typeguesser()
@@ -118,15 +129,48 @@ if __name__ == "__main__":
     w.build_filetable()
     # print(w.file_entries)
 
-    print("Found", len(w.file_entries), "blobs.")
-    # show empty blobs
-    # 472
-    blob = w.get_blob(472)
+    # remove 0 size blobs
+    print("Removing empty blobs...")
+    files = list(filter(lambda x: len(x) != 0, map(
+        lambda x: w.get_blob(x), range(len(w.file_entries)))))
 
-    print("Blob size:", len(blob) // 1024, "kb")
+    print("Found", len(w.file_entries), "blobs,", len(files), "not empty")
 
-    wav = add_wave_header(blob)
-    open("blob.wav", "wb+").write(wav)
+    limit = int(input("Filesize limit in kb: "))
+    start = int(input("Specify start index: "))
+
+    audio_entropies = []
+
+    for index in range(start, len(files)):
+        blob = files[index]
+        filesize = (len(blob) + 1023) // 1024
+
+        if (filesize > limit):
+            print("File", index, "Size:", filesize,
+                  "kb, entropy:", t.get_entropy(blob))
+            play_audio = input("Play audio file? (y/n) ")
+
+            if(play_audio.lower() == "y"):
+                entropy = t.get_entropy(blob)
+                print("Playing file " + str(index) +
+                      "... ", end="", flush=True)
+
+                # play first 20kb
+                playable = sa.WaveObject(
+                    blob[:20000], num_channels=1, bytes_per_sample=1, sample_rate=11025)
+                status = playable.play()
+                status.wait_done()
+
+                is_audio = input("was the file playable? (y/n) ")
+
+                if(is_audio.lower() == "y"):
+                    audio_entropies.append(entropy)
+
+                    print("Average audio entropy:", sum(
+                        audio_entropies) / float(len(audio_entropies)), "| ", end="")
+
+                    open("audio/file-" + str(index) + ".wav",
+                         "wb+").write(add_wave_header(blob))
 
     """ while True:
         index = int(input("Choose file blob to analyse: "))
@@ -141,7 +185,7 @@ if __name__ == "__main__":
             open("blob."+file_format, "wb+").write(blob) """
 
     # print(blob)
-    #open("blob.mid", "wb+").write(blob)
+    # open("blob.mid", "wb+").write(blob)
     # print(t.guess(blob))
 
     for key, val in w.file_entries.items():
