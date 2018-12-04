@@ -22,6 +22,7 @@ class Prover():
     will be evaluated upon calling .run() of the instance.
 
     A child-class should only track points for a _single_ scenario!
+    (e.g. that a given class is probably a jpg)
     """
     def __init__(self,*args,**kwargs):
         self.__class__.score = 0
