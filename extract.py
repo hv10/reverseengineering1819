@@ -122,7 +122,7 @@ def setup():
 if __name__ == "__main__":
     setup()
 
-    file_oi = Path("./War Data")
+    file_oi = Path(__file__).parent / "War Data"
     w = WarExtractor(file_oi)
     t = Typeguesser()
     # print(w.get_version())
@@ -160,6 +160,7 @@ if __name__ == "__main__":
                     blob[:20000], num_channels=1, bytes_per_sample=1, sample_rate=11025)
                 status = playable.play()
                 status.wait_done()
+                del playable
 
                 is_audio = input("was the file playable? (y/n) ")
 
