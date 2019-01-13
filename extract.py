@@ -95,6 +95,7 @@ class Typeguesser():
 
 
 def add_wave_header(blob):
+    magic = b"RIFF"
     format_length = 16
     wav_fmt = 1
     channels = 1
@@ -103,7 +104,7 @@ def add_wave_header(blob):
     blog_align = channels * ((bits_per_sample + 7) // 8)
     bytes_per_second = sample_rate * blog_align
 
-    header = struct.pack("4sI4s", b"RIFF", 36 + len(blob), b"WAVE")
+    header = struct.pack("4sI4s", magic, 36 + len(blob), b"WAVE")
 
     fmt = struct.pack("4sIHHIIHH", b"fmt ", format_length, wav_fmt, channels,
                       sample_rate, bytes_per_second, blog_align, 8)
