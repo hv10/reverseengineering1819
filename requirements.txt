@@ -1,3 +1,4 @@
 pillow
 filetype
 simpleaudio
+asciimatics

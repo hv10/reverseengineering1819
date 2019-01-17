@@ -7,6 +7,12 @@ import math
 import struct
 import simpleaudio as sa
 
+# 8byte palette header + 256 entry each 8 bytes
+# 2bytes key
+# RRGGBB
+# but wierdly 2052??
+PALETTE_LENGTH = 2052
+
 
 class WarExtractor():
     def __init__(self, f_path):
@@ -17,6 +23,10 @@ class WarExtractor():
 
     def loadFile(self):
         self.data = open(self.f_path, mode="rb").read()
+
+    def save_blob(self, index):
+        open("blob/file-" + str(index),
+             "wb+").write(self.get_blob(index))
 
     def get_version(self):
         return self.data[:4]
@@ -95,7 +105,6 @@ class Typeguesser():
 
 
 def add_wave_header(blob):
-    magic = b"RIFF"
     format_length = 16
     wav_fmt = 1
     channels = 1
@@ -104,7 +113,7 @@ def add_wave_header(blob):
     blog_align = channels * ((bits_per_sample + 7) // 8)
     bytes_per_second = sample_rate * blog_align
 
-    header = struct.pack("4sI4s", magic, 36 + len(blob), b"WAVE")
+    header = struct.pack("4sI4s", b"RIFF", 36 + len(blob), b"WAVE")
 
     fmt = struct.pack("4sIHHIIHH", b"fmt ", format_length, wav_fmt, channels,
                       sample_rate, bytes_per_second, blog_align, 8)
@@ -123,7 +132,7 @@ def setup():
 if __name__ == "__main__":
     setup()
 
-    file_oi = Path("./War Data")
+    file_oi = Path(__file__).parent / "War Data"
     w = WarExtractor(file_oi)
     t = Typeguesser()
     # print(w.get_version())
@@ -136,6 +145,19 @@ if __name__ == "__main__":
         lambda x: w.get_blob(x), range(len(w.file_entries)))))
 
     print("Found", len(w.file_entries), "blobs,", len(files), "not empty")
+
+    print("Searching for palettes..")
+    palettes = list(filter(lambda x: len(x) == PALETTE_LENGTH, map(
+        lambda x: w.get_blob(x), range(len(w.file_entries)))))
+
+    for pal in range(len(palettes)):
+        open("palettes/palette-" + str(pal) + ".pal",
+             "wb+").write(palettes[pal])
+
+    index = int(input("Save index no: "))
+    w.save_blob(index)
+
+    """
 
     limit = int(input("Filesize limit in kb: "))
     start = int(input("Specify start index: "))
@@ -161,6 +183,7 @@ if __name__ == "__main__":
                     blob[:20000], num_channels=1, bytes_per_sample=1, sample_rate=11025)
                 status = playable.play()
                 status.wait_done()
+                del playable
 
                 is_audio = input("was the file playable? (y/n) ")
 
@@ -173,7 +196,7 @@ if __name__ == "__main__":
                     open("audio/file-" + str(index) + ".wav",
                          "wb+").write(add_wave_header(blob))
 
-    """ while True:
+    while True:
         index = int(input("Choose file blob to analyse: "))
         blob = w.get_blob(index)
 
@@ -183,7 +206,7 @@ if __name__ == "__main__":
             print("Blob entropy:", t.get_entropy(blob))
 
             file_format = input("Input file format ")
-            open("blob."+file_format, "wb+").write(blob) """
+            open("blob."+file_format, "wb+").write(blob)
 
     # print(blob)
     # open("blob.mid", "wb+").write(blob)
@@ -192,3 +215,4 @@ if __name__ == "__main__":
     for key, val in w.file_entries.items():
         if (w.file_entries[key]["compressed"]):
             print(val)
+    """
