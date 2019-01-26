@@ -1,9 +1,28 @@
 import React, { Component } from 'react';
 import md5 from 'blueimp-md5';
+import { connect } from 'react-redux';
 import { hot } from 'react-hot-loader/root';
 
-import FileLoader from './components/FileLoader';
+import { AppBar, Toolbar, Typography } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+
 import Canvas from './components/Canvas';
+
+import WarExtractor from './components/WarExtractor';
+import FileTable from './components/FileTable';
+import EditModal from './components/EditBlob';
+
+import styles from './index.scss';
+
+const style = {
+    topbar: {
+        display: 'flex',
+        justifyContent: 'space-between'
+    },
+    text: {
+        color: 'white'
+    }
+};
 
 const Encoder = new TextDecoder('utf-8');
 
@@ -105,12 +124,44 @@ class App extends Component {
 
     render() {
         const { width, height, palette, selectedPallete, fast } = this.state;
+        const { classes, version, endianess } = this.props;
 
         return (
             <>
-                <p>War Data extractor</p>
+                <AppBar position="static">
+                    <Toolbar className={classes.topbar}>
+                        <Typography className={classes.text} variant="h4">
+                            WarExtractor
+                        </Typography>
+                        {version && (
+                            <Typography variant="h6" className={classes.text}>
+                                Version: {version} for {endianess} endianess
+                            </Typography>
+                        )}
+                    </Toolbar>
+                </AppBar>
 
-                <label>
+                <main id={styles.main}>
+                    <WarExtractor />
+                    <FileTable />
+                </main>
+
+                <EditModal />
+            </>
+        );
+    }
+}
+
+const mapStateToProps = state => ({
+    version: state.wardata.version,
+    endianess: state.wardata.endianess
+});
+
+export default hot(connect(mapStateToProps)(withStyles(style)(App)));
+
+/**
+ * 
+ * <label>
                     Fast mode
                     <input
                         type="checkbox"
@@ -135,9 +186,4 @@ class App extends Component {
                     disabled={!selectedPallete}
                 />
                 <Canvas ref={this.canvas} width={width} height={height} />
-            </>
-        );
-    }
-}
-
-export default hot(App);
+ */

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Button } from '@material-ui/core';
 
 class FileLoader extends Component {
     handleFile = e => {
@@ -9,7 +10,7 @@ class FileLoader extends Component {
             reader.readAsArrayBuffer(file);
 
             reader.addEventListener('load', () => {
-                this.props.getBlob(reader.result);
+                this.props.onBlob(reader.result);
             });
         }
     };
@@ -18,19 +19,25 @@ class FileLoader extends Component {
         const disabled = this.props.disabled ? 'disabled' : '';
 
         return (
-            <div>
-                <input
-                    multiple
-                    type="file"
-                    onChange={this.handleFile}
-                    disabled={disabled}
-                />
-            </div>
+            <>
+                <Button variant="contained" component="label">
+                    <input
+                        multiple
+                        type="file"
+                        onChange={this.handleFile}
+                        disabled={disabled}
+                        style={{
+                            display: 'none'
+                        }}
+                    />
+                    Upload WarFile
+                </Button>
+            </>
         );
     }
 
     static propTypes = {
-        getBlob: PropTypes.func.isRequired,
+        onBlob: PropTypes.func.isRequired,
 
         disabled: PropTypes.bool
     };

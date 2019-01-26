@@ -1,12 +1,15 @@
 const path = require('path');
+const webpack = require('webpack');
 
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const HardSource = require('hard-source-webpack-plugin');
 
+const isProd = process.env.NODE_ENV === 'production';
+
 module.exports = {
     entry: './src/index.js',
     mode: 'development',
-    devtool: 'inline-source-map',
+    devtool: isProd ? 'sourcemap' : 'inline-source-map',
     output: {
         path: path.resolve(__dirname, './dist'),
         filename: 'bundle.js'
@@ -28,6 +31,20 @@ module.exports = {
                         cacheDirectory: true
                     }
                 }
+            },
+            {
+                test: /\.s?css$/,
+                exclude: /node_modules/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true
+                        }
+                    },
+                    'sass-loader'
+                ]
             }
         ]
     },
@@ -35,6 +52,9 @@ module.exports = {
         new HTMLWebpackPlugin({
             template: './src/index.html'
         }),
-        new HardSource()
+        new HardSource(),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        })
     ]
 };
