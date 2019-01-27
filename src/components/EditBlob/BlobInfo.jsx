@@ -11,6 +11,8 @@ import {
 
 import * as FileTypes from './../../constants/filetypes';
 
+import { setFileType } from './../../actions/store';
+
 class BlobInfo extends Component {
     state = {
         value: FileTypes.UNKNOWN,
@@ -56,7 +58,12 @@ class BlobInfo extends Component {
                             </MenuItem>
                         ))}
                     </Select>
-                    <Button>Save choice</Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => this.props.setFileType(this.state.value)}
+                    >
+                        Save choice
+                    </Button>
                 </FormControl>
             </>
         );
@@ -68,4 +75,11 @@ const mapStateToProps = state => ({
     filetype: state.datastore[state.dialog.id]?.filetype //entropy and guess
 });
 
-export default connect(mapStateToProps)(BlobInfo);
+const mapDispatchToProps = (dispatch, ownProps) => ({
+    setFileType: type => dispatch(setFileType(ownProps.id, type))
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(BlobInfo);

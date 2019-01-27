@@ -5,6 +5,8 @@ import { Typography } from '@material-ui/core';
 
 import TextLoader, { TEXT_LOADER } from './../TextLoader';
 import AudioLoader, { AUDIO_LOADER } from './../AudioLoader';
+import ImageLoader, { IMAGE_LOADER } from './../ImageLoader';
+import SpriteLoader, { SPRITE_LOADER } from './../SpriteLoader';
 
 class FileTestTab extends Component {
     state = {
@@ -33,6 +35,12 @@ class FileTestTab extends Component {
                 <button onClick={this.testBlob(AUDIO_LOADER)}>
                     Check if audio
                 </button>
+                <button onClick={this.testBlob(IMAGE_LOADER)}>
+                    Check if image
+                </button>
+                <button onClick={this.testBlob(SPRITE_LOADER)}>
+                    Check if sprite
+                </button>
                 {this.state.test && (
                     <div>
                         {(() => {
@@ -47,6 +55,16 @@ class FileTestTab extends Component {
                                         <AudioLoader blob={this.props.blob} />
                                     );
                                 }
+                                case IMAGE_LOADER: {
+                                    return (
+                                        <ImageLoader blob={this.props.blob} />
+                                    );
+                                }
+                                case SPRITE_LOADER: {
+                                    return (
+                                        <SpriteLoader blob={this.props.blob} />
+                                    );
+                                }
                                 default: {
                                     return <p>Who toucha my spaget ?</p>;
                                 }
@@ -59,12 +77,12 @@ class FileTestTab extends Component {
     }
 
     static propTypes = {
-        blob: PropTypes.object.isRequired
+        blob: PropTypes.object
     };
 }
 
 const mapStateToProps = state => ({
-    blob: state.datastore[state.dialog.id].blob
+    blob: state.datastore[state.dialog.id]?.blob
 });
 
 export default connect(mapStateToProps)(FileTestTab);

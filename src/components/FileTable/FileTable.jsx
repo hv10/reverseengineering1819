@@ -15,14 +15,18 @@ import { batchActions } from 'redux-batched-actions';
 import { isEqual } from 'lodash/lang';
 
 import { predictBlob } from '../../actions/prediction';
-import { storeBlob } from '../../actions/store';
+import { storeBlob, setFileType } from '../../actions/store';
 import { openModal } from '../../actions/dialog';
+
+import * as FileTypes from './../../constants/filetypes';
 
 class FileTable extends Component {
     state = {
         page: 0,
         rowsPerPage: 10
     };
+
+    predictionQueue = [];
 
     changePage = (evt, page) => {
         this.setState(() => ({
@@ -57,13 +61,21 @@ class FileTable extends Component {
         window.requestIdleCallback(() => {
             console.log(`Idle predicting ${toBePredicted[0]}`);
 
-            if (!toBePredicted[1].prediction) {
+            if (!this.predictionQueue.includes(toBePredicted[0])) {
+                this.predictionQueue.push(toBePredicted[0]);
+
                 const blob = this.props.wardata.subarray(
                     toBePredicted[1].file_offset,
                     toBePredicted[1].file_offset + toBePredicted[1].blobsize
                 );
 
-                this.props.predictBlob(toBePredicted[0], blob);
+                this.props.predictBlob(
+                    toBePredicted[0],
+                    blob,
+                    toBePredicted[1].blobsize === 2056
+                        ? FileTypes.PALTETTE
+                        : FileTypes.UNKNOWN
+                );
             }
         });
     }
@@ -170,8 +182,14 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    predictBlob: (id, blob) =>
-        dispatch(batchActions([predictBlob(id, blob), storeBlob(id, blob)])),
+    predictBlob: (id, blob, filetype = FileTypes.UNKNOWN) =>
+        dispatch(
+            batchActions([
+                predictBlob(id, blob),
+                storeBlob(id, blob),
+                setFileType(id, filetype)
+            ])
+        ),
     openModal: id => dispatch(openModal(id))
 });
 

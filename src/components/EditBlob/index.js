@@ -46,7 +46,11 @@ class EditModal extends Component {
                     Blob: <i>{this.props.data.name || this.props.data.id}</i>
                 </DialogTitle>
                 <DialogContent>
-                    {this.state.currentTab === 0 ? <BlobInfo /> : <FileTest />}
+                    {this.state.currentTab === 0 ? (
+                        <BlobInfo id={this.props.data.id} />
+                    ) : (
+                        <FileTest />
+                    )}
                 </DialogContent>
                 <Paper>
                     <Tabs
