@@ -23,7 +23,10 @@ import * as FileTypes from './../../constants/filetypes';
 const SORT_FILTER = {
     empty: ([key, { blobsize }]) => blobsize > 0,
     pallette: ([key, { blobsize }]) => blobsize === 2056,
-    audio: ([key, { filetype }]) => filetype === FileTypes.AUDIO
+    audio: ([key, { filetype }]) => filetype === FileTypes.AUDIO,
+    sprite: ([key, { filetype }]) => filetype === FileTypes.SPRITE,
+    image: ([key, { filetype }]) => filetype === FileTypes.IMAGE,
+    text: ([key, { filetype }]) => filetype === FileTypes.TEXT
 };
 
 const styles = {
@@ -112,6 +115,24 @@ class TableWrapper extends Component {
                             control={<Checkbox />}
                             label="Show audios"
                             value="audio"
+                            onChange={this.toggleFilter}
+                        />
+                        <FormControlLabel
+                            control={<Checkbox />}
+                            label="Show sprites"
+                            value="sprite"
+                            onChange={this.toggleFilter}
+                        />
+                        <FormControlLabel
+                            control={<Checkbox />}
+                            label="Show images"
+                            value="image"
+                            onChange={this.toggleFilter}
+                        />
+                        <FormControlLabel
+                            control={<Checkbox />}
+                            label="Show Text"
+                            value="text"
                             onChange={this.toggleFilter}
                         />
                     </FormGroup>

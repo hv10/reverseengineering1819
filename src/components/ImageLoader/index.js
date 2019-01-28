@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { saveAs } from 'file-saver';
 
 import {
     Select,
@@ -76,6 +77,12 @@ class ImageLoader extends Component {
         }));
     };
 
+    export = () => {
+        this.canvas.current.canvas.current.toBlob(blob => {
+            saveAs(blob, 'image.png');
+        });
+    };
+
     static getDerivedStateFromProps(props, state) {
         const palettes = [];
         for (let { blob, id } of props.palettes) {
@@ -149,6 +156,9 @@ class ImageLoader extends Component {
                     onClick={this.showImage}
                 >
                     Render Image
+                </Button>
+                <Button variant="outlined" onClick={this.export}>
+                    Export image
                 </Button>
             </>
         );
