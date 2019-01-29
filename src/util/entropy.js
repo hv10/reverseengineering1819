@@ -23,8 +23,8 @@ const getEntropy = blob => {
     return entropy;
 };
 
-const isAudio = val => val >= 0.8;
-const isPallette = val => val >= 0.5 && val < 0.75;
+const isAudio = val => val >= 0.66;
+const isPallette = val => val >= 0.5 && val < 0.65;
 const isText = val => val <= 0.25;
 
 export const predict = val => {

@@ -57,12 +57,18 @@ class FileTestTab extends Component {
                                 }
                                 case IMAGE_LOADER: {
                                     return (
-                                        <ImageLoader blob={this.props.blob} />
+                                        <ImageLoader
+                                            blob={this.props.blob}
+                                            id={this.props.id}
+                                        />
                                     );
                                 }
                                 case SPRITE_LOADER: {
                                     return (
-                                        <SpriteLoader blob={this.props.blob} />
+                                        <SpriteLoader
+                                            blob={this.props.blob}
+                                            id={this.props.id}
+                                        />
                                     );
                                 }
                                 default: {
@@ -82,6 +88,7 @@ class FileTestTab extends Component {
 }
 
 const mapStateToProps = state => ({
+    id: state.dialog.id,
     blob: state.datastore[state.dialog.id]?.blob
 });
 

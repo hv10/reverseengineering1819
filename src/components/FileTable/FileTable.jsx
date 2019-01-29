@@ -117,11 +117,12 @@ class FileTable extends Component {
                                         compressed,
                                         file_offset,
                                         blobsize,
-                                        prediction
+                                        prediction,
+                                        name
                                     }
                                 ]) => (
                                     <TableRow key={id}>
-                                        <TableCell>{id}</TableCell>
+                                        <TableCell>{name || id}</TableCell>
                                         <TableCell>{file_offset}</TableCell>
                                         <TableCell>{blobsize}</TableCell>
                                         <TableCell>

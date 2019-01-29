@@ -135,7 +135,7 @@ class SpriteLoader extends Component {
 
     export = () => {
         this.canvas.current.canvas.current.toBlob(blob => {
-            saveAs(blob, 'image.png');
+            saveAs(blob, `${this.props.name}.png`);
         });
     };
 
@@ -230,13 +230,14 @@ class SpriteLoader extends Component {
     }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, ownProps) => ({
     palettes: Object.entries(state.datastore)
         .filter(([key, entry]) => entry.filetype === FileTypes.PALTETTE)
         .map(([id, val]) => ({
             id,
             ...val
-        }))
+        })),
+    name: state.datastore[ownProps.id]?.name || ownProps.id
 });
 
 export const SPRITE_LOADER = 'SPRITE_LOADER';

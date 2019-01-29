@@ -145,12 +145,13 @@ class TableWrapper extends Component {
 
 const mapStateToProps = state => ({
     file_table: Object.entries(state.wardata?.file_table).map(([key, val]) => [
-        state.datastore[key]?.name || key,
+        key,
         {
             ...val,
             blob: state.datastore[key]?.blob,
             prediction: state.prediction[key],
-            filetype: state.datastore[key]?.filetype
+            filetype: state.datastore[key]?.filetype,
+            name: state.datastore[key]?.name
         }
     ])
 });

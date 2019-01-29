@@ -35,6 +35,26 @@ const store = (state = default_store, action) => {
                 }
             };
         }
+        case SET_FILENAME: {
+            const store = Object.entries(state).reduce((acc, [key, value]) => {
+                if (key === action.old) {
+                    return {
+                        ...acc,
+                        [action.old]: {
+                            ...value,
+                            name: action.name
+                        }
+                    };
+                }
+
+                return {
+                    ...acc,
+                    [key]: value
+                };
+            }, {});
+
+            return store;
+        }
         default: {
             return state;
         }

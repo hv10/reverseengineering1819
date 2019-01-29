@@ -6,17 +6,19 @@ import {
     Select,
     InputLabel,
     MenuItem,
-    Button
+    Button,
+    TextField
 } from '@material-ui/core';
 
 import * as FileTypes from './../../constants/filetypes';
 
-import { setFileType } from './../../actions/store';
+import { setFileType, setFileName } from './../../actions/store';
 
 class BlobInfo extends Component {
     state = {
         value: FileTypes.UNKNOWN,
-        isSelectOpen: false
+        isSelectOpen: false,
+        filename: ''
     };
 
     openSelect = () => {
@@ -36,6 +38,23 @@ class BlobInfo extends Component {
             value: e.target.value
         }));
     };
+
+    updateFileName = e => {
+        const value = e.target.value;
+
+        this.setState(() => ({
+            filename: value
+        }));
+    };
+
+    save = () => {
+        this.props.setFileType(this.state.value);
+
+        if (this.state.filename) {
+            this.props.setFileName(this.props.id, this.state.filename);
+        }
+    };
+
     render() {
         return (
             <>
@@ -58,10 +77,14 @@ class BlobInfo extends Component {
                             </MenuItem>
                         ))}
                     </Select>
-                    <Button
-                        variant="outlined"
-                        onClick={() => this.props.setFileType(this.state.value)}
-                    >
+
+                    <TextField
+                        label="Filename"
+                        onChange={this.updateFileName}
+                        defaultValue={this.props.name || this.props.id}
+                    />
+
+                    <Button variant="outlined" onClick={this.save}>
                         Save choice
                     </Button>
                 </FormControl>
@@ -71,12 +94,14 @@ class BlobInfo extends Component {
 }
 
 const mapStateToProps = state => ({
+    id: state.dialog.id,
     ...state.prediction[state.dialog.id],
-    filetype: state.datastore[state.dialog.id]?.filetype //entropy and guess
+    ...state.datastore[state.dialog.id]
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    setFileType: type => dispatch(setFileType(ownProps.id, type))
+    setFileType: type => dispatch(setFileType(ownProps.id, type)),
+    setFileName: (id, name) => dispatch(setFileName(id, name))
 });
 
 export default connect(
